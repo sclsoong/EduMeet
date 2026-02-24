@@ -1,5 +1,5 @@
 # EduMeetOS
-
+<img src="images/team.jpg" alt="团队照片" style="width:100%;">
 开源无人机与机器狗操作系统。  
 Open-source OS for drones and robotic dogs.
 
