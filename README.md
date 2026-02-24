@@ -1,6 +1,8 @@
  EduMeetOS
-<img src="pexels-olly-3931634.jpg" alt="团队照片" style="width:100%;">
-开源无人机与机器狗操作系统。  
+><img src="pexels-olly-3931634.jpg" alt="团队照片" style="width:100%;">
+
+开源无人机与机器狗操作系统。
+
 Open-source OS for drones and robotic dogs.
 
 ## 版本 Editions
@@ -16,19 +18,26 @@ Open-source OS for drones and robotic dogs.
 
 ## 加入我们 Join
 开源，等你来。
+
 <!-- 页脚区域 -->
 <footer style="background: #f2f2f2; color: #333; padding: 2rem 1rem 1rem; font-family: system-ui, -apple-system, sans-serif; border-top: 1px solid #ddd;">
-    <div style="max-width: 1200px; margin: 0 auto;">
+  <div style="max-width: 1200px; margin: 0 auto;">
 
-        <!-- 第一行：链接网格 -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 2rem; font-size: 0.85rem;">
-            <!-- 列1：系统版本 -->
-            <div>
-                <div style="font-weight: 600; margin-bottom: 1rem;">EduMeetOS</div>
-                <div><a href="#" style="color: #555; text-decoration: none; display: block; margin-bottom: 0.5rem;">家庭版</a></div>
-                <div><a href="#" style="color: #555; text-decoration: none; display: block; margin-bottom: 0.5rem;">教育版</a></div>
-                <div><a href="#" style="color: #555; text-decoration: none; display: block; margin-bottom: 0.5rem;">会议版</a></div>
-                <div><a href="#" style="color: #555; text-decoration: none; display: block; margin-bottom: 0.5rem;">开发者版</a></div>
+    <!-- 第一行：链接网格 -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 2rem; font-size: 0.85rem;">
+
+      <!-- 列1：系统版本 -->
+      <div>
+        <div style="font-weight: 600; margin-bottom: 1rem;">EduMeetOS</div>
+        <div><a href="#" style="color: #555; text-decoration: none; display: block; margin-bottom: 0.5rem;">家庭版</a></div>
+        <div><a href="#" style="color: #555; text-decoration: none; display: block; margin-bottom: 0.5rem;">教育版</a></div>
+        <div><a href="#" style="color: #555; text-decoration: none; display: block; margin-bottom: 0.5rem;">会议版</a></div>
+        <div><a href="#" style="color: #555; text-decoration: none; display: block; margin-bottom: 0.5rem;">开发者版</a></div>
+      </div>
+
+    </div> <!-- 结束链接网格 -->
+  </div> <!-- 结束 max-width 容器 -->
+</footer>
             </div>
             <!-- 列2：硬件设备 -->
             <div>
