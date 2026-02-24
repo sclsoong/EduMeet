@@ -73,7 +73,6 @@ Open-source OS for drones and robotic dogs.
         </div>
 
     </div>
-</footer>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -97,34 +96,37 @@ Open-source OS for drones and robotic dogs.
             padding: 1rem;
         }
         .container {
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
             background: #111;
             border-radius: 48px;
-            padding: 2.5rem 2rem;
+            padding: 2rem;
             box-shadow: 0 30px 60px rgba(0,0,0,0.8);
             border: 1px solid #222;
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
         }
         .earth-container {
+            flex-shrink: 0;
+            width: 120px;
             display: flex;
             justify-content: center;
-            margin-bottom: 2rem;
-            perspective: 800px;
+            padding-top: 1rem;
         }
         .earth {
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
             background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="%232a6f97" stroke="%234d9eff" stroke-width="0.5"/><path d="M20 30 Q40 20 60 30 T90 40" stroke="%236b8cff" fill="none" stroke-width="1.5"/><path d="M15 60 Q40 75 70 60" stroke="%236b8cff" fill="none" stroke-width="1.5"/><circle cx="50" cy="50" r="4" fill="%23ffd966" filter="url(%23glow)"/><defs><filter id="glow"><feGaussianBlur stdDeviation="2" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs></svg>') no-repeat center;
             background-size: contain;
-            animation: gentleRock 8s ease-in-out infinite;
-            transform-origin: center;
+            animation: rotate 20s linear infinite;
         }
-        @keyframes gentleRock {
-            0% { transform: rotate(0deg) scale(1); }
-            25% { transform: rotate(5deg) scale(1.02); }
-            50% { transform: rotate(0deg) scale(1); }
-            75% { transform: rotate(-5deg) scale(0.98); }
-            100% { transform: rotate(0deg) scale(1); }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .content {
+            flex: 1;
         }
         .step-indicator {
             display: flex;
@@ -274,6 +276,15 @@ Open-source OS for drones and robotic dogs.
             font-size: 0.85rem;
             margin-top: 0.5rem;
         }
+        @media (max-width: 700px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .earth-container {
+                margin-bottom: 1rem;
+            }
+        }
         @media (max-width: 600px) {
             .container { padding: 1.5rem; }
             .question { font-size: 1.5rem; }
@@ -287,70 +298,100 @@ Open-source OS for drones and robotic dogs.
             <div class="earth"></div>
         </div>
 
-        <div class="step-indicator">
-            <div class="step-dot active" id="step1-dot"></div>
-            <div class="step-dot" id="step2-dot"></div>
-            <div class="step-dot" id="step3-dot"></div>
-        </div>
+        <div class="content">
+            <div class="step-indicator">
+                <div class="step-dot active" id="step1-dot"></div>
+                <div class="step-dot" id="step2-dot"></div>
+                <div class="step-dot" id="step3-dot"></div>
+            </div>
 
-        <!-- 步骤1: 国家选择 -->
-        <div class="step active-step" id="step1">
-            <div class="question">Where are you building from?</div>
-            <div class="options" id="country-options">
-                <!-- 动态生成国家选项，也可直接写静态 -->
+            <!-- 步骤1: 国家/大洲选择 -->
+            <div class="step active-step" id="step1">
+                <div class="question">Where are you building from?</div>
+                <div class="options" id="region-options">
+                    <!-- 动态生成国家/大洲选项 -->
+                </div>
+                <button class="locate-btn" id="detect-location">
+                    <span>📍</span> Detect automatically
+                </button>
+                <div class="navigation">
+                    <span></span>
+                    <button class="btn primary" id="step1-next" disabled>Next</button>
+                </div>
             </div>
-            <button class="locate-btn" id="detect-location">
-                <span>📍</span> Detect automatically
-            </button>
-            <div class="navigation">
-                <span></span>
-                <button class="btn primary" id="step1-next" disabled>Next</button>
-            </div>
-        </div>
 
-        <!-- 步骤2: 行业选择 -->
-        <div class="step" id="step2">
-            <div class="question">What brings you here?</div>
-            <div class="options" id="industry-options">
-                <!-- 动态生成行业选项 -->
+            <!-- 步骤2: 语言选择 -->
+            <div class="step" id="step2">
+                <div class="question">Choose your language</div>
+                <div class="options" id="language-options">
+                    <!-- 动态生成语言选项 -->
+                </div>
+                <div class="navigation">
+                    <button class="btn secondary" id="step2-back">Back</button>
+                    <button class="btn primary" id="step2-next" disabled>Next</button>
+                </div>
             </div>
-            <div class="navigation">
-                <button class="btn secondary" id="step2-back">Back</button>
-                <button class="btn primary" id="step2-next" disabled>Next</button>
-            </div>
-        </div>
 
-        <!-- 步骤3: 个性化信息 -->
-        <div class="step" id="step3">
-            <div class="question">Here's something for you</div>
-            <div id="personalized-message" class="response-message">
-                <!-- 内容动态填充 -->
+            <!-- 步骤3: 行业选择 + 个性化信息 -->
+            <div class="step" id="step3">
+                <div class="question">What brings you here?</div>
+                <div class="options" id="industry-options">
+                    <!-- 动态生成行业选项 -->
+                </div>
+                <div id="personalized-message" class="response-message" style="display: none;">
+                    <!-- 行业选完后显示 -->
+                </div>
+                <div class="navigation">
+                    <button class="btn secondary" id="step3-back">Back</button>
+                    <button class="btn primary" id="step3-done" style="display: none;">Return to Home</button>
+                </div>
             </div>
-            <div class="navigation">
-                <button class="btn secondary" id="step3-back">Back</button>
-                <button class="btn primary" id="step3-done">Return to Home</button>
-            </div>
-        </div>
 
-        <div class="small-note">
-            * No data is stored. This is just a greeting.
+            <div class="small-note">
+                * No data is stored. This is just a greeting.
+            </div>
         </div>
     </div>
 
     <script>
         (function() {
-            // 数据
-            const countries = [
-                { code: 'us', name: 'United States' },
-                { code: 'uk', name: 'United Kingdom' },
-                { code: 'cn', name: 'China (简体中文)' },
-                { code: 'jp', name: 'Japan' },
-                { code: 'de', name: 'Germany' },
-                { code: 'fr', name: 'France' },
-                { code: 'in', name: 'India' },
-                { code: 'br', name: 'Brazil' },
-                { code: 'other', name: 'Other' }
+            // 地区数据：国家 + 大洲
+            const regions = [
+                { code: 'us', name: 'United States', type: 'country' },
+                { code: 'uk', name: 'United Kingdom', type: 'country' },
+                { code: 'cn', name: 'China', type: 'country' },
+                { code: 'jp', name: 'Japan', type: 'country' },
+                { code: 'de', name: 'Germany', type: 'country' },
+                { code: 'fr', name: 'France', type: 'country' },
+                { code: 'in', name: 'India', type: 'country' },
+                { code: 'br', name: 'Brazil', type: 'country' },
+                { code: 'africa', name: 'Africa', type: 'continent' },
+                { code: 'asia', name: 'Asia', type: 'continent' },
+                { code: 'europe', name: 'Europe', type: 'continent' },
+                { code: 'north-america', name: 'North America', type: 'continent' },
+                { code: 'south-america', name: 'South America', type: 'continent' },
+                { code: 'oceania', name: 'Oceania', type: 'continent' },
+                { code: 'other', name: 'Other / Prefer not to say', type: 'other' }
             ];
+
+            // 语言映射：根据地区代码返回语言选项
+            const languageMap = {
+                us: ['English', 'Spanish', 'Other'],
+                uk: ['English', 'Other'],
+                cn: ['简体中文', 'English', 'Other'],
+                jp: ['日本語', 'English', 'Other'],
+                de: ['Deutsch', 'English', 'Other'],
+                fr: ['Français', 'English', 'Other'],
+                in: ['Hindi', 'English', 'Other'],
+                br: ['Português', 'English', 'Other'],
+                africa: ['English', 'French', 'Arabic', 'Swahili', 'Other'],
+                asia: ['Chinese', 'English', 'Japanese', 'Korean', 'Other'],
+                europe: ['English', 'German', 'French', 'Spanish', 'Other'],
+                'north-america': ['English', 'Spanish', 'French', 'Other'],
+                'south-america': ['Spanish', 'Portuguese', 'English', 'Other'],
+                oceania: ['English', 'Other'],
+                other: ['English', 'Other']
+            };
 
             const industries = [
                 { id: 'it', name: 'IT / Developer' },
@@ -391,7 +432,9 @@ Open-source OS for drones and robotic dogs.
 
             // 当前状态
             let currentStep = 1;
-            let selectedCountry = null;
+            let selectedRegion = null;        // 选择的地区代码
+            let selectedRegionType = null;     // 'country', 'continent', 'other'
+            let selectedLanguage = null;
             let selectedIndustry = null;
 
             // DOM 元素
@@ -407,29 +450,53 @@ Open-source OS for drones and robotic dogs.
             const step3Back = document.getElementById('step3-back');
             const step3Done = document.getElementById('step3-done');
             const detectBtn = document.getElementById('detect-location');
-            const countryOptionsDiv = document.getElementById('country-options');
+            const regionOptionsDiv = document.getElementById('region-options');
+            const languageOptionsDiv = document.getElementById('language-options');
             const industryOptionsDiv = document.getElementById('industry-options');
             const messageDiv = document.getElementById('personalized-message');
 
-            // 渲染国家选项
-            function renderCountries() {
-                countryOptionsDiv.innerHTML = '';
-                countries.forEach(country => {
+            // 渲染地区选项
+            function renderRegions() {
+                regionOptionsDiv.innerHTML = '';
+                regions.forEach(region => {
                     const div = document.createElement('div');
                     div.className = 'option-item';
-                    div.dataset.code = country.code;
+                    div.dataset.code = region.code;
+                    div.dataset.type = region.type;
                     div.innerHTML = `
-                        <span>${country.name}</span>
+                        <span>${region.name}</span>
                         <span class="check">✓</span>
                     `;
                     div.addEventListener('click', () => {
-                        // 移除其他选中样式
-                        document.querySelectorAll('#country-options .option-item').forEach(el => el.classList.remove('selected'));
+                        document.querySelectorAll('#region-options .option-item').forEach(el => el.classList.remove('selected'));
                         div.classList.add('selected');
-                        selectedCountry = country.code;
+                        selectedRegion = region.code;
+                        selectedRegionType = region.type;
                         step1Next.disabled = false;
                     });
-                    countryOptionsDiv.appendChild(div);
+                    regionOptionsDiv.appendChild(div);
+                });
+            }
+
+            // 渲染语言选项（根据选择的地区）
+            function renderLanguages() {
+                languageOptionsDiv.innerHTML = '';
+                const langList = languageMap[selectedRegion] || ['English', 'Other'];
+                langList.forEach(lang => {
+                    const div = document.createElement('div');
+                    div.className = 'option-item';
+                    div.dataset.lang = lang;
+                    div.innerHTML = `
+                        <span>${lang}</span>
+                        <span class="check">✓</span>
+                    `;
+                    div.addEventListener('click', () => {
+                        document.querySelectorAll('#language-options .option-item').forEach(el => el.classList.remove('selected'));
+                        div.classList.add('selected');
+                        selectedLanguage = lang;
+                        step2Next.disabled = false;
+                    });
+                    languageOptionsDiv.appendChild(div);
                 });
             }
 
@@ -448,7 +515,16 @@ Open-source OS for drones and robotic dogs.
                         document.querySelectorAll('#industry-options .option-item').forEach(el => el.classList.remove('selected'));
                         div.classList.add('selected');
                         selectedIndustry = ind.id;
-                        step2Next.disabled = false;
+                        // 显示个性化信息
+                        const msg = messages[selectedIndustry] || messages.other;
+                        messageDiv.innerHTML = `<strong>${msg.title}</strong><p>${msg.body}</p>`;
+                        if (selectedRegion) {
+                            const regionName = regions.find(r => r.code === selectedRegion)?.name || 'your region';
+                            messageDiv.innerHTML += `<p style="margin-top:1rem; color:#888;">From ${regionName} · Language: ${selectedLanguage || 'English'}</p>`;
+                        }
+                        messageDiv.style.display = 'block';
+                        step3Done.style.display = 'inline-block';
+                        // 隐藏行业选项，可考虑添加返回修改功能
                     });
                     industryOptionsDiv.appendChild(div);
                 });
@@ -457,24 +533,25 @@ Open-source OS for drones and robotic dogs.
             // 更新步骤显示
             function goToStep(step) {
                 currentStep = step;
-                // 隐藏所有步骤
                 step1.classList.remove('active-step');
                 step2.classList.remove('active-step');
                 step3.classList.remove('active-step');
-                // 显示当前步骤
                 if (step === 1) {
                     step1.classList.add('active-step');
+                    // 重置后续状态
+                    selectedLanguage = null;
+                    selectedIndustry = null;
+                    messageDiv.style.display = 'none';
+                    step3Done.style.display = 'none';
                 } else if (step === 2) {
                     step2.classList.add('active-step');
+                    renderLanguages(); // 每次进入步骤2重新渲染语言
+                    step2Next.disabled = true;
                 } else if (step === 3) {
                     step3.classList.add('active-step');
-                    // 生成个性化信息
-                    const msg = messages[selectedIndustry] || messages.other;
-                    messageDiv.innerHTML = `<strong>${msg.title}</strong><p>${msg.body}</p>`;
-                    if (selectedCountry) {
-                        const countryName = countries.find(c => c.code === selectedCountry)?.name || 'your country';
-                        messageDiv.innerHTML += `<p style="margin-top:1rem; color:#888;">From ${countryName}</p>`;
-                    }
+                    renderIndustries();
+                    messageDiv.style.display = 'none';
+                    step3Done.style.display = 'none';
                 }
                 // 更新圆点
                 step1Dot.className = 'step-dot' + (step === 1 ? ' active' : (step > 1 ? ' completed' : ''));
@@ -484,18 +561,18 @@ Open-source OS for drones and robotic dogs.
 
             // 定位功能（模拟）
             detectBtn.addEventListener('click', () => {
-                // 这里可以用 Geolocation API，为了演示，我们模拟一个随机国家
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
                         (position) => {
-                            // 通常需要反向地理编码，这里简化：随机选择一个国家
-                            const randomIndex = Math.floor(Math.random() * (countries.length - 1)); // 避免选到 other
-                            const randomCountry = countries[randomIndex];
-                            // 高亮对应选项
-                            document.querySelectorAll('#country-options .option-item').forEach(el => {
-                                if (el.dataset.code === randomCountry.code) {
+                            // 这里简化：随机选一个国家
+                            const countryRegions = regions.filter(r => r.type === 'country');
+                            const randomIndex = Math.floor(Math.random() * countryRegions.length);
+                            const randomRegion = countryRegions[randomIndex];
+                            document.querySelectorAll('#region-options .option-item').forEach(el => {
+                                if (el.dataset.code === randomRegion.code) {
                                     el.classList.add('selected');
-                                    selectedCountry = randomCountry.code;
+                                    selectedRegion = randomRegion.code;
+                                    selectedRegionType = randomRegion.type;
                                     step1Next.disabled = false;
                                 } else {
                                     el.classList.remove('selected');
@@ -513,25 +590,23 @@ Open-source OS for drones and robotic dogs.
 
             // 按钮事件
             step1Next.addEventListener('click', () => {
-                if (selectedCountry) goToStep(2);
+                if (selectedRegion) goToStep(2);
             });
             step2Back.addEventListener('click', () => {
                 goToStep(1);
             });
             step2Next.addEventListener('click', () => {
-                if (selectedIndustry) goToStep(3);
+                if (selectedLanguage) goToStep(3);
             });
             step3Back.addEventListener('click', () => {
                 goToStep(2);
             });
             step3Done.addEventListener('click', () => {
-                // 返回首页或刷新
-                window.location.href = '/'; // 或者你的首页地址
+                window.location.href = '/'; // 返回首页
             });
 
             // 初始化
-            renderCountries();
-            renderIndustries();
+            renderRegions();
             goToStep(1);
         })();
     </script>
