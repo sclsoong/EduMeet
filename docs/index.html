@@ -230,3 +230,206 @@
     </div>
 </body>
 </html>
+<style>
+    .cookie-consent * { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+    .cookie-consent {
+        position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1000;
+        background: #1a1a1a; color: #e0e0e0; border-top: 1px solid #333;
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.3); display: none;
+    }
+    .cookie-bar {
+        max-width: 1200px; margin: 0 auto; padding: 1rem 1.5rem;
+        display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+        gap: 1rem;
+    }
+    .cookie-bar p { margin: 0; font-size: 0.95rem; line-height: 1.5; color: #ccc; }
+    .cookie-actions {
+        display: flex; gap: 0.8rem; flex-wrap: wrap;
+    }
+    .cookie-btn {
+        background: transparent; border: 1px solid #555; color: #fff;
+        padding: 0.6rem 1.5rem; border-radius: 30px; font-size: 0.9rem;
+        cursor: pointer; transition: all 0.2s;
+    }
+    .cookie-btn:hover { background: #333; border-color: #777; }
+    .cookie-btn-primary {
+        background: #007aff; border-color: #007aff; color: white;
+    }
+    .cookie-btn-primary:hover { background: #005bbf; border-color: #005bbf; }
+
+    /* 模态框（详细设置） */
+    .cookie-modal {
+        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.7); z-index: 1100; align-items: center; justify-content: center;
+    }
+    .cookie-modal.show { display: flex; }
+    .cookie-modal-content {
+        background: #1e1e1e; border-radius: 24px; max-width: 500px; width: 90%;
+        padding: 2rem; color: #e0e0e0; border: 1px solid #333; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    .cookie-modal h3 { margin: 0 0 1rem 0; font-size: 1.5rem; font-weight: 500; }
+    .cookie-modal p { color: #aaa; font-size: 0.95rem; line-height: 1.5; }
+    .cookie-category {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 1rem 0; border-bottom: 1px solid #333;
+    }
+    .cookie-category:last-child { border-bottom: none; }
+    .cookie-category label { font-weight: 500; cursor: pointer; }
+    .cookie-category input[type="checkbox"] {
+        width: 18px; height: 18px; cursor: pointer; accent-color: #007aff;
+    }
+    .cookie-category .locked {
+        color: #888; font-size: 0.9rem; margin-left: 10px;
+    }
+    .modal-actions {
+        display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;
+    }
+    .modal-actions button {
+        padding: 0.7rem 1.5rem; border-radius: 30px; font-size: 0.9rem; cursor: pointer;
+        background: transparent; border: 1px solid #555; color: #fff; transition: 0.2s;
+    }
+    .modal-actions button:hover { background: #333; }
+    .modal-actions .save-btn {
+        background: #007aff; border-color: #007aff;
+    }
+    .modal-actions .save-btn:hover { background: #005bbf; }
+</style>
+
+<div class="cookie-consent" id="cookieBar">
+    <div class="cookie-bar">
+        <p id="cookieMessage"></p>
+        <div class="cookie-actions">
+            <button class="cookie-btn" id="cookieDeclineAll"></button>
+            <button class="cookie-btn" id="cookieShowSettings"></button>
+            <button class="cookie-btn cookie-btn-primary" id="cookieAcceptAll"></button>
+        </div>
+    </div>
+</div>
+
+<div class="cookie-modal" id="cookieModal">
+    <div class="cookie-modal-content">
+        <h3 id="modalTitle"></h3>
+        <p id="modalDesc"></p>
+
+        <div class="cookie-category">
+            <label><span id="essentialLabel"></span> <span class="locked">(必选)</span></label>
+            <input type="checkbox" id="essentialCheckbox" disabled checked>
+        </div>
+        <div class="cookie-category">
+            <label id="analyticsLabel"></label>
+            <input type="checkbox" id="analyticsCheckbox">
+        </div>
+        <div class="cookie-category">
+            <label id="adsLabel"></label>
+            <input type="checkbox" id="adsCheckbox">
+        </div>
+
+        <div class="modal-actions">
+            <button id="modalCancel"></button>
+            <button class="save-btn" id="modalSave"></button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    const lang = (navigator.language || '').toLowerCase();
+    const isZh = lang.startsWith('zh');
+
+    const texts = {
+        bar: isZh ? '我们使用必要的Cookie来确保网站正常运行。您可以选择接受或拒绝分析/广告Cookie，这不会影响核心功能。' : 'We use essential cookies for the website to function. You can accept or decline analytics/advertising cookies – this won\'t affect core functionality.',
+        acceptAll: isZh ? '接受全部' : 'Accept All',
+        declineAll: isZh ? '拒绝全部' : 'Decline All',
+        settings: isZh ? '自定义设置' : 'Customize',
+        modalTitle: isZh ? 'Cookie 偏好设置' : 'Cookie Preferences',
+        modalDesc: isZh ? '您可以随时调整以下偏好设置。必要Cookie始终启用。' : 'You can adjust your preferences below. Essential cookies are always enabled.',
+        essential: isZh ? '必要Cookie' : 'Essential',
+        analytics: isZh ? '分析Cookie' : 'Analytics',
+        ads: isZh ? '广告Cookie' : 'Advertising',
+        cancel: isZh ? '取消' : 'Cancel',
+        save: isZh ? '保存设置' : 'Save Settings',
+    };
+
+    // 设置文本
+    document.getElementById('cookieMessage').innerText = texts.bar;
+    document.getElementById('cookieAcceptAll').innerText = texts.acceptAll;
+    document.getElementById('cookieDeclineAll').innerText = texts.declineAll;
+    document.getElementById('cookieShowSettings').innerText = texts.settings;
+    document.getElementById('modalTitle').innerText = texts.modalTitle;
+    document.getElementById('modalDesc').innerText = texts.modalDesc;
+    document.getElementById('essentialLabel').innerHTML = texts.essential + ' <span class="locked">(必选)</span>';
+    document.getElementById('analyticsLabel').innerText = texts.analytics;
+    document.getElementById('adsLabel').innerText = texts.ads;
+    document.getElementById('modalCancel').innerText = texts.cancel;
+    document.getElementById('modalSave').innerText = texts.save;
+
+    const COOKIE_KEY = 'cookie_consent';
+    const DAYS = 30;
+
+    function setConsent(level) {
+        const value = JSON.stringify(level);
+        localStorage.setItem(COOKIE_KEY, value);
+        // 如果有真实广告代码（如uetq），这里会更新 consent 状态 [citation:3][citation:5]
+        if (typeof window.uetq !== 'undefined') {
+            window.uetq.push('consent', 'update', {
+                'ad_storage': level.ads ? 'granted' : 'denied'
+            });
+        }
+        document.getElementById('cookieBar').style.display = 'none';
+    }
+
+    function getConsent() {
+        const stored = localStorage.getItem(COOKIE_KEY);
+        return stored ? JSON.parse(stored) : null;
+    }
+
+    function showBarIfNeeded() {
+        if (!getConsent()) {
+            document.getElementById('cookieBar').style.display = 'block';
+        }
+    }
+
+    // 读取当前偏好（如果有）用于模态框初始化
+    const current = getConsent();
+
+    // 按钮事件
+    document.getElementById('cookieAcceptAll').addEventListener('click', () => {
+        setConsent({ essential: true, analytics: true, ads: true });
+    });
+
+    document.getElementById('cookieDeclineAll').addEventListener('click', () => {
+        setConsent({ essential: true, analytics: false, ads: false });
+    });
+
+    document.getElementById('cookieShowSettings').addEventListener('click', () => {
+        // 用已有偏好初始化（如果有），否则默认只有必要是 true
+        const prefs = current || { essential: true, analytics: false, ads: false };
+        document.getElementById('analyticsCheckbox').checked = prefs.analytics;
+        document.getElementById('adsCheckbox').checked = prefs.ads;
+        document.getElementById('cookieModal').classList.add('show');
+    });
+
+    document.getElementById('modalCancel').addEventListener('click', () => {
+        document.getElementById('cookieModal').classList.remove('show');
+    });
+
+    document.getElementById('modalSave').addEventListener('click', () => {
+        const newPrefs = {
+            essential: true,
+            analytics: document.getElementById('analyticsCheckbox').checked,
+            ads: document.getElementById('adsCheckbox').checked
+        };
+        setConsent(newPrefs);
+        document.getElementById('cookieModal').classList.remove('show');
+    });
+
+    // 点击模态框背景可关闭（可选）
+    document.getElementById('cookieModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('cookieModal')) {
+            document.getElementById('cookieModal').classList.remove('show');
+        }
+    });
+
+    showBarIfNeeded();
+})();
+</script>
