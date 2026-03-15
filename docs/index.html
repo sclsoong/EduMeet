@@ -152,6 +152,239 @@
             <span style="color:#999; font-size:1rem;">Open-source OS for drones and robotic dogs</span>
         </div>
                    我们正在完成必要的更新，计划在四月份完工，您可以先收藏网站。
+
+             <!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduMeet · 功能预告幻灯片（带箭头）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        /* 外层容器 - 方便嵌入，不依赖外部样式 */
+        .edu-slider {
+            width: 100%;
+            max-width: 900px;      /* 可自行调整 */
+            margin: 0 auto;
+            position: relative;
+            font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            background: #0f3b6f;   /* 深蓝底 */
+        }
+        .edu-slides-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;  /* 固定比例，可自行调整 */
+            min-height: 200px;
+        }
+        .edu-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            background-color: #0f3b6f;
+            color: white;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            pointer-events: none;
+            border-radius: 32px;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+        }
+        .edu-slide.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .edu-slide h2 {
+            font-size: clamp(1.5rem, 5vw, 3rem);
+            font-weight: 500;
+            line-height: 1.4;
+            max-width: 700px;
+            margin: 0 auto;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .edu-slide p {
+            font-size: 1.2rem;
+            margin-top: 1rem;
+            opacity: 0.9;
+        }
+
+        /* 左右箭头 */
+        .edu-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            cursor: pointer;
+            z-index: 20;
+            transition: background 0.2s;
+            user-select: none;
+        }
+        .edu-arrow:hover {
+            background: rgba(255,255,255,0.4);
+        }
+        .edu-arrow-left {
+            left: 20px;
+        }
+        .edu-arrow-right {
+            right: 20px;
+        }
+
+        /* 指示点 */
+        .edu-dots {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 20;
+        }
+        .edu-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.4);
+            cursor: default;
+            transition: background 0.3s;
+        }
+        .edu-dot.active {
+            background: white;
+            box-shadow: 0 0 10px white;
+        }
+
+        /* 可选：隐藏箭头在移动端调整 */
+        @media (max-width: 480px) {
+            .edu-arrow {
+                width: 36px;
+                height: 36px;
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 嵌入到你的网站只需复制此块 -->
+    <div class="edu-slider">
+        <div class="edu-slides-container">
+            <!-- 幻灯片 1 -->
+            <div class="edu-slide active" data-index="0">
+                <h2>此次升级包含几个新功能</h2>
+            </div>
+            <!-- 幻灯片 2 -->
+            <div class="edu-slide" data-index="1">
+                <h2>完善的辅助功能<br><span style="font-size: 0.7em; display: block; margin-top: 0.8rem;">我们希望你能更轻松浏览</span></h2>
+            </div>
+            <!-- 幻灯片 3 -->
+            <div class="edu-slide" data-index="2">
+                <h2>我们即将发布3个产品<br><span style="font-size: 0.7em; display: block; margin-top: 0.8rem;">敬请期待</span></h2>
+            </div>
+
+            <!-- 左右箭头 -->
+            <div class="edu-arrow edu-arrow-left" id="eduArrowLeft">←</div>
+            <div class="edu-arrow edu-arrow-right" id="eduArrowRight">→</div>
+
+            <!-- 指示点 -->
+            <div class="edu-dots">
+                <span class="edu-dot active"></span>
+                <span class="edu-dot"></span>
+                <span class="edu-dot"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const slides = document.querySelectorAll('.edu-slide');
+            const dots = document.querySelectorAll('.edu-dot');
+            const arrowLeft = document.getElementById('eduArrowLeft');
+            const arrowRight = document.getElementById('eduArrowRight');
+            let currentIndex = 0;
+            const totalSlides = slides.length;
+            const intervalTime = 30000; // 30秒
+            let timer;
+
+            // 显示指定索引的幻灯片
+            function showSlide(index) {
+                // 边界处理（循环）
+                if (index < 0) index = totalSlides - 1;
+                if (index >= totalSlides) index = 0;
+
+                // 更新幻灯片
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+                // 更新指示点
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === index);
+                });
+                currentIndex = index;
+            }
+
+            // 下一张
+            function nextSlide() {
+                showSlide(currentIndex + 1);
+                resetTimer();
+            }
+
+            // 上一张
+            function prevSlide() {
+                showSlide(currentIndex - 1);
+                resetTimer();
+            }
+
+            // 重置自动轮播计时器
+            function resetTimer() {
+                if (timer) clearInterval(timer);
+                timer = setInterval(nextSlide, intervalTime);
+            }
+
+            // 绑定箭头事件
+            arrowLeft.addEventListener('click', prevSlide);
+            arrowRight.addEventListener('click', nextSlide);
+
+            // 启动自动轮播
+            timer = setInterval(nextSlide, intervalTime);
+
+            // 可选：当页面隐藏时停止计时（节省资源）
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    clearInterval(timer);
+                } else {
+                    // 重新启动时重置计时器，但保留当前页面
+                    timer = setInterval(nextSlide, intervalTime);
+                }
+            });
+
+            // 确保点击箭头时不会触发任何默认行为
+            arrowLeft.addEventListener('mousedown', (e) => e.preventDefault());
+            arrowRight.addEventListener('mousedown', (e) => e.preventDefault());
+        })();
+    </script>
+    <!-- 嵌入块结束 -->
+</body>
+</html>      
         <h2>版本</h2>
         <div class="grid">
             <div class="card">
