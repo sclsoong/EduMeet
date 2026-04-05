@@ -1063,672 +1063,440 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>EduMeet 小飞 · Windows 10 风格助手</title>
-    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>EduMeet · 轻松使用 + Nyx 助手</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none; /* 避免拖拽时选中文字，但输入框内允许 */
         }
 
         body {
-            background: #1e1e2e;
+            background: linear-gradient(145deg, #0a0f1e 0%, #0c1222 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Segoe UI', '微软雅黑', system-ui, sans-serif;
+            font-family: 'Inter', sans-serif;
             padding: 20px;
+            position: relative;
         }
 
-        /* 主卡片 - Win10 风格 */
-        .chat-card {
-            width: 100%;
-            max-width: 750px;
-            height: 650px;
-            background: #2b2b2e;
-            border-radius: 8px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-            display: none;
-            flex-direction: column;
+        /* 主内容区（示例） */
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 32px;
+            padding: 2rem;
+            color: white;
+            text-align: center;
+        }
+        .main-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .main-content p {
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        /* ========== 轻松使用面板（右下角折叠） ========== */
+        .ease-panel {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 280px;
+            background: rgba(20, 28, 40, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transform: translateX(0);
+            transition: transform 0.3s ease;
             overflow: hidden;
-            border: 1px solid #3a3a3e;
         }
-
-        /* 标题栏 */
-        .title-bar {
-            background: #202022;
+        .ease-panel.collapsed {
+            transform: translateX(calc(100% - 48px));
+        }
+        .ease-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: 12px 16px;
+            background: rgba(0,0,0,0.3);
+            cursor: pointer;
+            color: white;
+        }
+        .ease-header span {
+            font-weight: 500;
+        }
+        .ease-header i {
+            transition: transform 0.3s;
+        }
+        .ease-panel.collapsed .ease-header i {
+            transform: rotate(180deg);
+        }
+        .ease-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .ease-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid #3a3a3e;
+            color: white;
         }
-        .title-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .title-left i {
-            font-size: 20px;
-            color: #ffb900;
-        }
-        .title-left span {
-            font-size: 14px;
-            font-weight: 500;
-            color: #e0e0e0;
-        }
-        .title-right {
-            display: flex;
-            gap: 8px;
-        }
-        .title-right i {
-            color: #aaa;
+        .ease-item button {
+            background: #6c5ce7;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            color: white;
             cursor: pointer;
-            font-size: 14px;
-            padding: 4px;
-            border-radius: 4px;
+            font-size: 12px;
             transition: 0.2s;
         }
-        .title-right i:hover {
-            background: #3a3a3e;
-            color: white;
+        .ease-item button:hover {
+            background: #5a4bcf;
+        }
+        /* 放大镜专用滑块 */
+        .zoom-control {
+            margin-top: 8px;
+            display: none;
+        }
+        .zoom-control.show {
+            display: block;
+        }
+        input[type=range] {
+            width: 100%;
+            margin-top: 8px;
+            background: #3a3a4a;
+            height: 4px;
+            border-radius: 2px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            background: #6c5ce7;
         }
 
-        /* 设置区域 */
-        .settings-bar {
-            background: #252528;
-            padding: 8px 16px;
+        /* ========== Copilot 浮动按钮 ========== */
+        .copilot-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background: #6c5ce7;
+            border-radius: 50%;
             display: flex;
-            gap: 16px;
             align-items: center;
-            flex-wrap: wrap;
-            border-bottom: 1px solid #3a3a3e;
-            font-size: 13px;
-        }
-        .settings-bar select, .settings-bar textarea {
-            background: #3a3a3e;
-            border: none;
+            justify-content: center;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.4);
+            z-index: 1100;
+            transition: 0.2s;
             color: white;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 12px;
+            border: none;
         }
-        .settings-bar textarea {
-            width: 200px;
-            height: 60px;
-            resize: vertical;
-            font-family: monospace;
+        .copilot-btn:hover {
+            transform: scale(1.05);
+            background: #5a4bcf;
+            box-shadow: 0 6px 16px rgba(108, 92, 231, 0.6);
         }
-        .settings-bar label {
-            color: #ccc;
+
+        /* ========== 聊天窗口 ========== */
+        .chat-window {
+            position: fixed;
+            bottom: 100px;
+            right: 100px;
+            width: 380px;
+            height: 500px;
+            background: rgba(20, 28, 40, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(108, 92, 231, 0.4);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: none;
+            flex-direction: column;
+            z-index: 1200;
+            overflow: hidden;
+        }
+        .chat-header {
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            cursor: move;
+            border-bottom: 1px solid rgba(108, 92, 231, 0.3);
+        }
+        .chat-header .title {
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 6px;
         }
-        .settings-bar input[type="checkbox"] {
-            accent-color: #ffb900;
+        .chat-header .title i {
+            color: #6c5ce7;
         }
-
-        /* 消息区域 */
+        .chat-header .close-chat {
+            cursor: pointer;
+            font-size: 18px;
+        }
         .messages-area {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            background: #252528;
+            gap: 12px;
         }
-        .messages-area::-webkit-scrollbar {
-            width: 6px;
-        }
-        .messages-area::-webkit-scrollbar-track {
-            background: #2b2b2e;
-        }
-        .messages-area::-webkit-scrollbar-thumb {
-            background: #5a5a5e;
-            border-radius: 4px;
-        }
-
         .message {
             display: flex;
             align-items: flex-start;
-            gap: 12px;
+            gap: 8px;
             max-width: 85%;
-            animation: fadeIn 0.2s ease;
         }
         .user-message {
             align-self: flex-end;
             flex-direction: row-reverse;
         }
         .bubble {
-            background: #3a3a3e;
-            padding: 10px 14px;
+            background: #1e293b;
+            padding: 8px 12px;
             border-radius: 18px;
-            line-height: 1.45;
-            font-size: 0.9rem;
-            color: #e0e0e0;
-            word-break: break-word;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            font-size: 0.85rem;
+            color: #eef2ff;
         }
         .user-message .bubble {
-            background: #ffb900;
-            color: #1e1e2e;
+            background: #6c5ce7;
+            color: white;
         }
-        .avatar-icon {
-            width: 32px;
-            height: 32px;
-            background: #3a3a3e;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            flex-shrink: 0;
-            color: #ffb900;
-        }
-        .user-message .avatar-icon {
-            background: #ffb900;
-            color: #1e1e2e;
-        }
-
-        /* 输入区 */
         .input-area {
-            padding: 16px;
-            border-top: 1px solid #3a3a3e;
             display: flex;
-            gap: 12px;
-            align-items: center;
-            background: #202022;
+            padding: 12px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            gap: 8px;
         }
-        .input-wrapper {
+        .input-area input {
             flex: 1;
-        }
-        .input-wrapper input {
-            width: 100%;
-            background: #3a3a3e;
+            background: #111827;
             border: none;
             border-radius: 24px;
-            padding: 10px 16px;
+            padding: 8px 12px;
             color: white;
-            font-size: 0.9rem;
             outline: none;
         }
-        .input-wrapper input:focus {
-            box-shadow: 0 0 0 2px #ffb900;
-        }
-        .send-btn {
-            background: #ffb900;
+        .input-area button {
+            background: #6c5ce7;
             border: none;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border-radius: 24px;
+            padding: 0 16px;
+            color: white;
             cursor: pointer;
-            transition: 0.2s;
-        }
-        .send-btn i {
-            font-size: 20px;
-            color: #1e1e2e;
-        }
-        .send-btn:hover {
-            background: #ffcc44;
-            transform: scale(1.02);
-        }
-        .plane-takeoff {
-            animation: takeoffFly 0.5s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
-        }
-        @keyframes takeoffFly {
-            0% { transform: translate(0,0) rotate(0deg); opacity:1; }
-            30% { transform: translate(8px,-12px) rotate(15deg); }
-            100% { transform: translate(80px,-40px) rotate(25deg); opacity:0; }
-        }
-        @keyframes fadeIn {
-            from { opacity:0; transform: translateY(8px); }
-            to { opacity:1; transform: translateY(0); }
         }
         .typing-indicator {
-            background: #3a3a3e;
-            padding: 8px 14px;
-            border-radius: 20px;
+            background: #1e293b;
+            padding: 8px 12px;
+            border-radius: 18px;
             display: inline-flex;
-            gap: 6px;
+            gap: 4px;
         }
         .typing-dot {
-            width: 8px;
-            height: 8px;
-            background: #ffb900;
+            width: 6px;
+            height: 6px;
+            background: #8f9bb5;
             border-radius: 50%;
-            animation: pulse 1.2s infinite;
+            animation: pulse 1s infinite;
         }
         @keyframes pulse {
-            0%,60%,100% { transform: translateY(0); opacity:0.4; }
-            30% { transform: translateY(-6px); opacity:1; }
+            0%,100%{ opacity:0.4; transform: translateY(0);}
+            50%{ opacity:1; transform: translateY(-4px);}
         }
 
-        /* 模态框（法律同意） */
+        /* 模态框（同意条款） */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.7);
             backdrop-filter: blur(8px);
             z-index: 2000;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
         }
         .modal-container {
             max-width: 500px;
             width: 90%;
-            background: #2b2b2e;
-            border-radius: 12px;
+            background: #1e293b;
+            border-radius: 24px;
             padding: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            border: 1px solid #3a3a3e;
-            color: #e0e0e0;
+            color: white;
         }
         .modal-container h3 {
-            font-size: 1.4rem;
             margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
         .terms-box {
-            background: #1e1e2e;
-            border-radius: 12px;
+            background: #0f172a;
+            border-radius: 16px;
             padding: 16px;
             margin: 16px 0;
             font-size: 0.85rem;
             max-height: 240px;
             overflow-y: auto;
-            line-height: 1.5;
-            border: 1px solid #3a3a3e;
         }
-        .agree-check, .improve-check {
+        .agree-check {
             display: flex;
             align-items: center;
             gap: 12px;
             margin: 16px 0;
         }
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
         .modal-btn {
-            background: #ffb900;
-            border: none;
-            padding: 12px;
+            flex: 1;
+            padding: 10px;
             border-radius: 40px;
-            color: #1e1e2e;
-            font-weight: 600;
-            width: 100%;
+            border: none;
             cursor: pointer;
-            transition: 0.2s;
+            font-weight: 600;
+        }
+        .modal-btn.primary {
+            background: #6c5ce7;
+            color: white;
+        }
+        .modal-btn.secondary {
+            background: #334155;
+            color: white;
         }
         .modal-btn.disabled {
-            background: #5a5a5e;
+            opacity: 0.5;
             cursor: not-allowed;
-            opacity: 0.6;
-        }
-        .fine-print {
-            font-size: 0.7rem;
-            text-align: center;
-            margin-top: 16px;
-            color: #aaa;
-        }
-        a {
-            color: #ffb900;
-            text-decoration: none;
         }
     </style>
 </head>
 <body>
-    <!-- 法律同意模态框 -->
-    <div id="consentModal" class="modal-overlay">
-        <div class="modal-container">
-            <h3><i class="fas fa-gavel"></i> 使用前请同意</h3>
-            <div class="terms-box">
-                <strong>📜 服务条款与隐私声明</strong><br><br>
-                1️⃣ 本助手提供的信息仅供参考，不构成专业建议。<br>
-                2️⃣ 对话数据完全在您本地设备处理，我们<strong>不收集、不上传</strong>任何个人信息。<br>
-                3️⃣ 您不得利用本助手进行违法或侵权活动。<br>
-                4️⃣ AI 回答可能存在偏差，请自行判断。<br>
-                5️⃣ 继续使用即表示您同意以上条款。<br><br>
-                <span style="color:#ffb900;">✈️ 详细隐私政策请查看 <a href="#" id="privacyLink">隐私政策</a>。</span>
-            </div>
-            <div class="agree-check">
-                <input type="checkbox" id="agreeCheckbox"> <label>我已阅读并同意以上条款</label>
-            </div>
-            <div class="improve-check">
-                <input type="checkbox" id="improveCheckbox"> 
-                <div>
-                    <label>📊 帮助改进（可选）</label>
-                    <div class="privacy-note">允许匿名记录对话内容（仅存储于您本地设备），用于优化回答质量。<br>绝不收集隐私信息。</div>
-                </div>
-            </div>
-            <button id="agreeBtn" class="modal-btn disabled">同意并开始使用</button>
-            <div class="fine-print">不同意不影响网站其他功能，但助手不可用。</div>
+
+<div class="main-content">
+    <h1>EduMeet 无人机系统</h1>
+    <p>开源 · 模块化 · 用户主权</p>
+    <p>欢迎使用 Nyx 助手，夜之女神将陪伴你的飞行旅程。</p>
+</div>
+
+<!-- 轻松使用面板（右下角折叠） -->
+<div class="ease-panel" id="easePanel">
+    <div class="ease-header" id="easeToggle">
+        <span>⚙️ 轻松使用</span>
+        <i class="fas fa-chevron-left"></i>
+    </div>
+    <div class="ease-body" id="easeBody">
+        <div class="ease-item">
+            <span>🔍 放大镜</span>
+            <button id="toggleMagnifier">关闭</button>
+        </div>
+        <div class="zoom-control" id="zoomControl">
+            <input type="range" id="zoomSlider" min="3" max="8" value="3" step="0.1">
+            <span style="color:white; font-size:12px">倍数: <span id="zoomValue">3.0</span>x</span>
+        </div>
+        <div class="ease-item">
+            <span>🗣️ 讲述人</span>
+            <button id="narratorBtn">试听</button>
+        </div>
+        <div class="ease-item">
+            <span>🌙 Nyx AI 助手</span>
+            <button id="openAssistantBtn">打开</button>
         </div>
     </div>
+</div>
 
-    <!-- 聊天主界面 -->
-    <div class="chat-card" id="chatCard">
-        <div class="title-bar">
-            <div class="title-left">
-                <i class="fas fa-drone"></i>
-                <span>EduMeet 小飞</span>
-            </div>
-            <div class="title-right">
-                <i class="fas fa-cog" id="settingsToggle" title="设置"></i>
-                <i class="fas fa-download" id="exportLogs" title="导出改进日志"></i>
-            </div>
-        </div>
+<!-- Copilot 浮动按钮 -->
+<div class="copilot-btn" id="copilotBtn">
+    <i class="fas fa-moon"></i>
+</div>
 
-        <!-- 可折叠设置区 -->
-        <div id="settingsPanel" style="display: none;">
-            <div class="settings-bar">
-                <label>模型：</label>
-                <select id="modelSelect"></select>
-                <label>流式输出：</label>
-                <input type="checkbox" id="streamCheckbox">
-                <label>系统提示词：</label>
-                <textarea id="systemPrompt" placeholder="可自定义AI的人设，例如：你是小飞，一个热情的朋友..."></textarea>
-            </div>
+<!-- 聊天窗口（初始隐藏） -->
+<div class="chat-window" id="chatWindow">
+    <div class="chat-header">
+        <div class="title">
+            <i class="fas fa-moon"></i>
+            <span>Nyx · 神秘助手</span>
         </div>
-
-        <div class="messages-area" id="messagesArea">
-            <div class="message">
-                <div class="avatar-icon"><i class="fas fa-robot"></i></div>
-                <div class="bubble">你好呀！我是小飞，EduMeet 的智能助手。有什么可以帮你的吗？ ✈️</div>
-            </div>
-        </div>
-        <div class="input-area">
-            <div class="input-wrapper">
-                <input type="text" id="userInput" placeholder="输入你的问题..." autocomplete="off">
-            </div>
-            <div class="send-btn" id="sendBtn">
-                <i class="fas fa-paper-plane" id="planeIcon"></i>
-            </div>
+        <i class="fas fa-times close-chat" id="closeChatBtn"></i>
+    </div>
+    <div class="messages-area" id="chatMessages">
+        <div class="message">
+            <div class="bubble">🌙 你好，我是 Nyx，夜之女神。有什么可以帮你的吗？</div>
         </div>
     </div>
+    <div class="input-area">
+        <input type="text" id="chatInput" placeholder="输入问题...">
+        <button id="chatSendBtn">发送</button>
+    </div>
+</div>
 
-    <script>
-        // ========== 配置 ==========
-        const OLLAMA_BASE = 'http://localhost:11434';
-        let currentModel = 'qwen2.5:1.5b';
-        let enableStream = false;
-        let systemPrompt = '';
-        let enableImprove = false;
-        let conversationLog = [];
-        let isWaiting = false;
-        let abortController = null;
+<!-- 同意模态框 -->
+<div id="consentModal" class="modal-overlay">
+    <div class="modal-container">
+        <h3>📜 使用前请同意</h3>
+        <div class="terms-box">
+            <strong>服务条款与隐私声明</strong><br><br>
+            1️⃣ 本助手提供的信息仅供参考，不构成专业建议。<br>
+            2️⃣ 对话数据完全在您本地设备处理，我们不收集、不上传任何个人信息。<br>
+            3️⃣ 您不得利用本助手进行违法或侵权活动。<br>
+            4️⃣ AI回答可能存在偏差，请自行判断。<br>
+            5️⃣ 继续使用即表示您同意以上条款。<br><br>
+            ✈️ 详细隐私政策请参考项目主页。
+        </div>
+        <div class="agree-check">
+            <input type="checkbox" id="consentCheckbox"> <label>我已阅读并同意以上条款</label>
+        </div>
+        <div class="modal-buttons">
+            <button id="rejectBtn" class="modal-btn secondary">暂不使用</button>
+            <button id="agreeBtn" class="modal-btn primary disabled">同意并开始</button>
+        </div>
+    </div>
+</div>
 
-        // DOM 元素
-        const consentModal = document.getElementById('consentModal');
-        const chatCard = document.getElementById('chatCard');
-        const agreeCheck = document.getElementById('agreeCheckbox');
-        const improveCheck = document.getElementById('improveCheckbox');
-        const agreeBtn = document.getElementById('agreeBtn');
-        const messagesArea = document.getElementById('messagesArea');
-        const userInput = document.getElementById('userInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const planeIcon = document.getElementById('planeIcon');
-        const modelSelect = document.getElementById('modelSelect');
-        const streamCheckbox = document.getElementById('streamCheckbox');
-        const systemPromptText = document.getElementById('systemPrompt');
-        const settingsToggle = document.getElementById('settingsToggle');
-        const settingsPanel = document.getElementById('settingsPanel');
-        const exportLogsBtn = document.getElementById('exportLogs');
+<script>
+    // ========== Ollama 配置 ==========
+    const OLLAMA_URL = 'http://localhost:11434/api/chat';
+    const MODEL = 'qwen2.5:1.5b';  // 可改成你拉取的模型
 
-        // ========== 加载模型列表 ==========
-        async function loadModels() {
-            try {
-                const res = await fetch(`${OLLAMA_BASE}/api/tags`);
-                const data = await res.json();
-                const models = data.models || [];
-                modelSelect.innerHTML = '';
-                models.forEach(m => {
-                    const option = document.createElement('option');
-                    option.value = m.name;
-                    option.textContent = `${m.name} (${(m.size / 1e9).toFixed(2)} GB)`;
-                    modelSelect.appendChild(option);
-                });
-                if (models.length > 0) currentModel = models[0].name;
-                modelSelect.value = currentModel;
-            } catch (e) {
-                console.warn('无法获取模型列表，使用默认模型');
-                modelSelect.innerHTML = '<option value="qwen2.5:1.5b">qwen2.5:1.5b (默认)</option>';
-                currentModel = 'qwen2.5:1.5b';
-                modelSelect.value = currentModel;
-            }
-        }
+    // 全局变量
+    let isWaiting = false;
+    let magnifierEnabled = false;
+    let zoomLevel = 3;
+    let magnifierDiv = null;
+    let magnifierContent = null;
+    let mouseX = 0, mouseY = 0;
+    let consented = false;
 
-        // ========== 发送消息 ==========
-        async function sendMessage() {
-            if (isWaiting) return;
-            const msg = userInput.value.trim();
-            if (!msg) return;
-            addMessage(msg, true);
-            userInput.value = '';
-            isWaiting = true;
-
-            await animatePlane();
-            showTyping();
-
-            try {
-                const messages = [];
-                if (systemPrompt.trim()) {
-                    messages.push({ role: 'system', content: systemPrompt.trim() });
-                }
-                messages.push({ role: 'user', content: msg });
-
-                const body = {
-                    model: currentModel,
-                    messages: messages,
-                    stream: enableStream,
-                    options: { temperature: 0.7 }
-                };
-
-                if (enableStream) {
-                    // 流式响应
-                    abortController = new AbortController();
-                    const response = await fetch(`${OLLAMA_BASE}/api/chat`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(body),
-                        signal: abortController.signal
-                    });
-                    const reader = response.body.getReader();
-                    const decoder = new TextDecoder();
-                    let fullText = '';
-                    let tempDiv = null;
-                    while (true) {
-                        const { done, value } = await reader.read();
-                        if (done) break;
-                        const chunk = decoder.decode(value);
-                        const lines = chunk.split('\n');
-                        for (const line of lines) {
-                            if (line.startsWith('data: ')) {
-                                const jsonStr = line.slice(6);
-                                if (jsonStr === '[DONE]') continue;
-                                try {
-                                    const data = JSON.parse(jsonStr);
-                                    const content = data.message?.content || '';
-                                    fullText += content;
-                                    if (!tempDiv) {
-                                        tempDiv = addMessage('', false);
-                                    }
-                                    const bubble = tempDiv.querySelector('.bubble');
-                                    bubble.textContent = fullText;
-                                    scrollToBottom();
-                                } catch(e) {}
-                            }
-                        }
-                    }
-                    removeTyping();
-                    if (tempDiv) {
-                        // 最终确认消息
-                        if (enableImprove) addLogEntry(msg, fullText);
-                    } else {
-                        addMessage('抱歉，没有收到回复。', false);
-                    }
-                } else {
-                    const response = await fetch(`${OLLAMA_BASE}/api/chat`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(body)
-                    });
-                    const data = await response.json();
-                    removeTyping();
-                    const reply = data.message?.content || '抱歉，没有收到回复。';
-                    addMessage(reply, false);
-                    if (enableImprove) addLogEntry(msg, reply);
-                }
-            } catch (error) {
-                console.error(error);
-                removeTyping();
-                addMessage('❌ 连接失败，请确认 Ollama 正在运行（终端运行 ollama serve）。', false);
-            } finally {
-                isWaiting = false;
-                abortController = null;
-            }
-        }
-
-        // 辅助函数
-        function addMessage(text, isUser = false) {
-            const div = document.createElement('div');
-            div.className = `message ${isUser ? 'user-message' : ''}`;
-            div.innerHTML = `
-                <div class="avatar-icon"><i class="fas ${isUser ? 'fa-user' : 'fa-robot'}"></i></div>
-                <div class="bubble">${escapeHtml(text)}</div>
-            `;
-            messagesArea.appendChild(div);
-            scrollToBottom();
-            return div;
-        }
-
-        function showTyping() {
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'message';
-            typingDiv.id = 'typingIndicator';
-            typingDiv.innerHTML = `
-                <div class="avatar-icon"><i class="fas fa-robot"></i></div>
-                <div class="typing-indicator">
-                    <span class="typing-dot"></span>
-                    <span class="typing-dot"></span>
-                    <span class="typing-dot"></span>
-                </div>
-            `;
-            messagesArea.appendChild(typingDiv);
-            scrollToBottom();
-        }
-
-        function removeTyping() {
-            const typing = document.getElementById('typingIndicator');
-            if (typing) typing.remove();
-        }
-
-        function scrollToBottom() {
-            messagesArea.scrollTop = messagesArea.scrollHeight;
-        }
-
-        function escapeHtml(str) {
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
-        }
-
-        async function animatePlane() {
-            return new Promise((resolve) => {
-                planeIcon.classList.add('plane-takeoff');
-                setTimeout(() => {
-                    planeIcon.classList.remove('plane-takeoff');
-                    resolve();
-                }, 500);
-            });
-        }
-
-        // 改进记录
-        function loadImproveLogs() {
-            const stored = localStorage.getItem('edumeet_improve_logs');
-            if (stored) try { conversationLog = JSON.parse(stored); } catch(e) {}
-        }
-        function saveImproveLogs() {
-            if (enableImprove) localStorage.setItem('edumeet_improve_logs', JSON.stringify(conversationLog));
-        }
-        function addLogEntry(userMsg, aiMsg) {
-            if (!enableImprove) return;
-            conversationLog.push({ timestamp: new Date().toISOString(), user: userMsg, assistant: aiMsg });
-            saveImproveLogs();
-        }
-        function exportLogs() {
-            if (!conversationLog.length) {
-                alert('暂无改进日志');
-                return;
-            }
-            const dataStr = JSON.stringify(conversationLog, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `edumeet_logs_${new Date().toISOString().slice(0,19)}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        // 同意逻辑
-        function initAfterConsent() {
-            consentModal.style.display = 'none';
-            chatCard.style.display = 'flex';
-            enableImprove = improveCheck.checked;
-            if (enableImprove) loadImproveLogs();
-            loadModels();
-            // 加载系统提示词默认值
-            systemPromptText.value = '你是小飞，EduMeet 的智能助手，性格热情、话多，回答要简洁自然。';
-            systemPrompt = systemPromptText.value;
-            streamCheckbox.addEventListener('change', () => enableStream = streamCheckbox.checked);
-            systemPromptText.addEventListener('input', () => systemPrompt = systemPromptText.value);
-            modelSelect.addEventListener('change', () => currentModel = modelSelect.value);
-            settingsToggle.addEventListener('click', () => {
-                settingsPanel.style.display = settingsPanel.style.display === 'none' ? 'block' : 'none';
-            });
-            exportLogsBtn.addEventListener('click', exportLogs);
-        }
-
-        // 检查是否同意
-        const hasConsented = sessionStorage.getItem('edumeet_consent');
-        if (hasConsented === 'true') {
-            initAfterConsent();
-        } else {
-            agreeCheck.addEventListener('change', function() {
-                agreeBtn.classList.toggle('disabled', !this.checked);
-            });
-            agreeBtn.addEventListener('click', function() {
-                if (!agreeCheck.checked) return;
-                sessionStorage.setItem('edumeet_consent', 'true');
-                initAfterConsent();
-            });
-        }
-
-        // 绑定发送事件
-        sendBtn.addEventListener('click', sendMessage);
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
-        // 隐私政策弹窗示例
-        document.getElementById('privacyLink')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            alert('隐私政策：所有对话数据仅本地存储，不上传任何服务器。详情请查阅项目主页。');
-        });
-    </script>
-</body>
-</html>
+    // DOM 元素
+    const easePanel = document.getElementById('easePanel');
+    const easeToggle = document.getElementById('easeToggle');
+    const toggleMagnifierBtn = document.getElementById('toggleMagnifier');
+    const zoomControl = document.getElementById('zoomControl');
+    const zoomSlider = document.getElementById('zoomSlider');
+    const zoomValueSpan = document.getElementById('zoomValue');
+    const narratorBtn = document.getElementById('narratorBtn');
+    const openAssistantBtn = document.getElementById('openAssistantBtn');
+    const copilotBtn = document.getElementById('copilotBtn');
+    const chatWindow = document.getElementById('chatWindow');
+    const closeChatBtn = document.getElementById('closeChatBtn');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const chatSendBtn = document.getElementById('chatSendBtn');
+    const consentModal = document.getElementById('consentModal');
+    const consentCheckbox = document.getElementById('consentCheckbox');
+    const rejectBtn = document.getElementById('rejectBtn');
+    const agreeBtn = document.getElementById('agreeBtn');
